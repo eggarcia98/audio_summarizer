@@ -1,5 +1,6 @@
 # segment_text.py
 import nltk
+from utils.text_processing_utils import extract_audio_segment_times
 
 def segment_text(transcript):
     # Tokenize the transcript into sentences using NLTK
