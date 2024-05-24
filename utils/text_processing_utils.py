@@ -1,15 +1,32 @@
 # recognize_speech.py
-import speech_recognition as sr
-import pydub
+import wave
+import json
+from vosk import Model, KaldiRecognizer
 
-def recognize_speech(features):
-    # Use a speech recognition library to generate a transcript from the audio features
-    r = sr.Recognizer()
-    transcript = r.recognize_google(features, language='en')
+model = Model("path/to/vosk-model")  # Replace with the path to your downloaded Vosk model
 
-    return transcript
 
-    # extract_audio_segment_times.py
+def recognize_speech(file_path):
+    wf = wave.open(file_path, "rb")
+    rec = KaldiRecognizer(model, wf.getframerate())
+
+    # Read the audio file
+    while True:
+        data = wf.readframes(4000)
+        if len(data) == 0:
+            break
+        if rec.AcceptWaveform(data):
+            result = rec.Result()
+        else:
+            result = rec.PartialResult()
+
+    # Get the final result
+    result = rec.FinalResult()
+    text = json.loads(result).get('text', '')
+    print("Transcription: " + text)
+
+    return text
+
 
 def extract_audio_segment_times(file_path, timestamp):
     # Implement logic to extract audio segment times based on file path and timestamp

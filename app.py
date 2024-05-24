@@ -18,17 +18,17 @@ def process_audio_file_endpoint():
     with open(output_file_path, 'wb') as output_file:
         output_file.write(file)
 
-    features = process_audio_file(output_file_path)
+    output_file_path = process_audio_file(output_file_path)
+    transcript = recognize_speech(output_file_path)
+    time_stamps = segment_text(transcript)
 
-    print(features)
-    
+    print(transcript)
+   
 
     return "Done!"
-    # transcript = recognize_speech(features)
-    # time_stamps = segment_text(transcript)
 
     # return jsonify({'time_stamps': time_stamps})
 
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5010)
+    app.run(debug=True, port=6030)
