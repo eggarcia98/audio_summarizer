@@ -23,7 +23,7 @@ def process_audio_file_endpoint():
     transcript = asyncio.run(recognize_speech(wav_audio_path))
     
     audio_remover(new_audio_path)
-    audio_remover(wav_audio_path)
+    # audio_remover(wav_audio_path)
     
     return transcript
 
