@@ -1,8 +1,8 @@
 """Module to manage async functions"""
 import asyncio
 import os
-from pydub import AudioSegment
 from operator import itemgetter
+from pydub import AudioSegment
 
 
 def process_audio_file(output_audio_path):

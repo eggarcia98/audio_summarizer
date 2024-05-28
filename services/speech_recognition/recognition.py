@@ -13,11 +13,14 @@ async def recognize_audio_speech(audio_chunk, initial_time=0):
     segment_chunk_duration_ms = 5000  
     transcripts = []
 
-    for start_offset in range(0, segment_duration_ms, segment_chunk_duration_ms):
-        end_offset = min(start_offset + segment_chunk_duration_ms, segment_duration_ms)
+   # Adjust step to include overlap
+    step_ms = segment_chunk_duration_ms - 1000
 
+    for start_offset in range(0, segment_duration_ms, step_ms):
+        end_offset = min(start_offset + segment_chunk_duration_ms, segment_duration_ms)
         segment_chunk = audio_chunk[start_offset:end_offset]
         wav_segment_chunk = segment_chunk.export(format="wav", codec="pcm_s16le")
+
         with sr.AudioFile(wav_segment_chunk) as audio_source:
             audio_data = recognizer.record(audio_source)
             transcript = await transcribe_audio(recognizer, audio_data)
@@ -37,7 +40,7 @@ async def recognize_speech(audio_file_path):
     """Recognize speech in an audio file by splitting it into chunks."""
     audio = AudioSegment.from_wav(audio_file_path)
 
-    audio_chunks = audio_splitter(audio, 120000)
+    audio_chunks = audio_splitter(audio)
     audios_to_process = queue_audios_chunks(audio_chunks, recognize_audio_speech)
 
     transcripts = await asyncio.gather(*audios_to_process)
