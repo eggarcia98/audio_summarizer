@@ -4,8 +4,8 @@ import asyncio
 from datetime import datetime
 from flask import Flask, request
 
-from services.audio_service import process_audio_file
-from utils.text_processing_utils import recognize_speech
+from utils.audio_processor import process_audio_file
+from services.speech_recognition.recognition import recognize_speech
 
 app = Flask(__name__)
 
