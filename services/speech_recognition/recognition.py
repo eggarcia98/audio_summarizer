@@ -5,7 +5,7 @@ from pydub import AudioSegment
 from services.speech_recognition.transcriptor import transcribe_audio
 from utils.audio_processor import audio_splitter, queue_audios_chunks
 
-async def recognize_audio_speech(audio_chunk, initial_time=0):
+async def recognize_audio_speech(audio_chunk, initial_time=0, overlap_ms=1000):
     """Recognize speech in a given audio segment."""
     recognizer = sr.Recognizer()
     segment_duration_ms = len(audio_chunk)
@@ -14,7 +14,7 @@ async def recognize_audio_speech(audio_chunk, initial_time=0):
     transcripts = []
 
    # Adjust step to include overlap
-    step_ms = segment_chunk_duration_ms - 1000
+    step_ms = segment_chunk_duration_ms - overlap_ms
 
     for start_offset in range(0, segment_duration_ms, step_ms):
         end_offset = min(start_offset + segment_chunk_duration_ms, segment_duration_ms)
