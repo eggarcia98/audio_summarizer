@@ -26,12 +26,10 @@ jsonpatch @ file:///private/var/folders/sy/f16zz6x50xz3113nwtb9bvq00000gp/T/abs_
 jsonpointer==2.1
 lazy_loader==0.4
 libmambapy @ file:///private/var/folders/c_/qfmhj66j0tn016nkx_th4hxm0000gp/T/abs_fd8o3vih03/croot/mamba-split_1714483651025/work/libmambapy
-librosa==0.10.2.post1
 llvmlite==0.42.0
 MarkupSafe==2.1.5
 menuinst @ file:///private/var/folders/sy/f16zz6x50xz3113nwtb9bvq00000gp/T/abs_cbtyh9z_3u/croot/menuinst_1714510891566/work
 msgpack==1.0.8
-nltk==3.8.1
 numba==0.59.1
 numpy==1.26.4
 packaging @ file:///private/var/folders/sy/f16zz6x50xz3113nwtb9bvq00000gp/T/abs_2bd6vdlyjt/croot/packaging_1710810554459/work
