@@ -2,7 +2,7 @@
 import asyncio
 import speech_recognition as sr
 from pydub import AudioSegment
-from transcriptor import transcribe_audio
+from services.speech_recognition.transcriptor import transcribe_audio
 
 async def recognize_speech_chunk(audio_chunk, start_time):
     """Recognize speech in a given audio chunk."""
