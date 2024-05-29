@@ -3,7 +3,21 @@ import asyncio
 import os
 from operator import itemgetter
 from pydub import AudioSegment
+import  yt_dlp
+ # client to many multimedia portals
 
+def get_audio_from_youtube(yt_url):
+    ydl_opts = {
+        'format': 'bestaudio/best',
+        'postprocessors': [{
+            'key': 'FFmpegExtractAudio',
+            'preferredcodec': 'mp3',
+            'preferredquality': '192',
+        }],
+    }
+    
+    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+        ydl.download([yt_url])
 
 def process_audio_file(output_audio_path):
     """Function to convert format audio to wav"""
@@ -45,3 +59,6 @@ def audio_remover(audio_path):
         os.remove(audio_path)
     else:
         print("The file does not exist")
+
+
+get_audio_from_youtube("https://www.youtube.com/watch?v=8OAPLk20epo")
