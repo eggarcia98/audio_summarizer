@@ -6,7 +6,16 @@ from pydub import AudioSegment
 import  yt_dlp
  # client to many multimedia portals
 
-def get_audio_from_youtube(yt_url):
+def get_audio_from_youtube(yt_url, audio_name_ouput):
+    """function to get an audio from youtube"""
+
+    downloaded_filename = None
+
+    def progress_hook(d):
+        nonlocal downloaded_filename
+        if d['status'] == 'finished':
+            downloaded_filename = d['filename']
+
     ydl_opts = {
         'format': 'bestaudio/best',
         'postprocessors': [{
@@ -14,10 +23,13 @@ def get_audio_from_youtube(yt_url):
             'preferredcodec': 'mp3',
             'preferredquality': '192',
         }],
+        'progress_hooks': [progress_hook],
     }
     
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         ydl.download([yt_url])
+    
+    return downloaded_filename
 
 def process_audio_file(output_audio_path):
     """Function to convert format audio to wav"""
@@ -61,4 +73,5 @@ def audio_remover(audio_path):
         print("The file does not exist")
 
 
-get_audio_from_youtube("https://www.youtube.com/watch?v=8OAPLk20epo")
+out = get_audio_from_youtube("https://www.youtube.com/watch?v=8OAPLk20epo", "final")
+print(out)
