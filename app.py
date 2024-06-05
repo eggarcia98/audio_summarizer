@@ -50,7 +50,7 @@ def process_audio_file_endpoint():
     audio_remover(wav_audio_path)
 
     merged_transcript = merge_overlapping_transcripts(transcript)
-    return merged_transcript
+    return jsonify({'data': merged_transcript}), 200
 
 if __name__ == '__main__':
     app.run(debug=True, port=6030)
