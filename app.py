@@ -1,5 +1,4 @@
 """Module to manage async functions"""
-import asyncio
 
 from datetime import datetime
 from flask import Flask, request, jsonify
@@ -17,6 +16,12 @@ model = whisper.load_model("base")
 
 app = Flask(__name__)
 
+@app.route("/",)
+@cross_origin()
+def root_path():
+    """GET - Root path"""
+    
+    return jsonify({"data": "done"}), 200
 
 @app.route('/summarize_audio', methods=['POST'])
 @cross_origin()
