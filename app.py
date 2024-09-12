@@ -5,6 +5,8 @@ from flask import Flask, request, jsonify
 from flask_cors import cross_origin
 
 from utils.audio_processor import process_audio_file, audio_remover, get_audio_from_youtube
+from services.db.queries import fetch_saved_audio_summary
+
 
 import whisper
 
@@ -20,8 +22,9 @@ app = Flask(__name__)
 @cross_origin()
 def root_path():
     """GET - Root path"""
-    
-    return jsonify({"data": "done"}), 200
+
+    saved_audio_summary = fetch_saved_audio_summary()
+    return jsonify({"data": saved_audio_summary}), 200
 
 @app.route('/summarize_audio', methods=['POST'])
 @cross_origin()
