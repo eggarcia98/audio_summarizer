@@ -56,7 +56,17 @@ def process_audio_file_endpoint():
     audio_remover(source_audio_path)
     audio_remover(wav_audio_path)
 
-    return jsonify({'data': result}), 200
+    parsed_segments = [
+    {
+        'audio_end_time': segment['end'],
+        'audio_start_time': segment['start'],
+        'transcript': segment['text'],
+        'isApproved': False  # Optional field
+    }
+    for segment in result['segments']
+]
+
+    return jsonify({"data": parsed_segments}), 200
 
 if __name__ == '__main__':
-    app.run(debug=True, port=6030)
+    app.run(debug=True, port=6030, host="0.0.0.0")
