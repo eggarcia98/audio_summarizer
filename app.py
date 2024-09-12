@@ -60,11 +60,11 @@ def process_audio_file_endpoint():
     {
         'audio_end_time': segment['end'],
         'audio_start_time': segment['start'],
-        'transcript': segment['text'],
+        'transcript': segment['text'].strip(),
         'isApproved': False  # Optional field
     }
     for segment in result['segments']
-]
+    ]
 
     return jsonify({"data": parsed_segments}), 200
 
