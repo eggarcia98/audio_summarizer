@@ -4,6 +4,8 @@ import os
 from operator import itemgetter
 from pydub import AudioSegment
 import  yt_dlp
+import hashlib
+
  # client to many multimedia portals
 
 def get_audio_from_youtube(yt_url):
@@ -35,17 +37,11 @@ def get_audio_from_youtube(yt_url):
     
     return downloaded_audio_dict
 
-import hashlib
-
-
 def generate_audio_hash_identificator(audio_payload):
     """Create a new SHA-256 hash object"""
     sha256_hash = hashlib.sha256()
-
-    # Update the hash object with the bytes of the file
     sha256_hash.update(audio_payload)
 
-    # Return the hexadecimal representation of the hash
     return sha256_hash.hexdigest()
 
 def get_audio_from_audio_file(audio_file):
@@ -53,7 +49,7 @@ def get_audio_from_audio_file(audio_file):
     audio_bytes = audio_file.read()
     audio_name = audio_file.filename
 
-    destine_audio_path = f"{audio_name}.mp3"
+    destine_audio_path = f"{audio_name}"
 
     with open(destine_audio_path, 'wb') as output_file:
         output_file.write(audio_bytes)
@@ -62,7 +58,6 @@ def get_audio_from_audio_file(audio_file):
         'filename': destine_audio_path,
         "id": generate_audio_hash_identificator(audio_bytes)
     })
-
 
 def process_audio_file(output_audio_path):
     """Function to convert format audio to wav"""

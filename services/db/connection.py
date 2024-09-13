@@ -23,7 +23,7 @@ def get_cursor():
     """Context manager to handle connection opening and closing"""
     conn = get_connection()
     try:
-        cursor = conn.cursor()
+        cursor = conn.cursor(row_factory=psycopg.rows.dict_row)
         yield cursor
         conn.commit()
     except Exception as e:
