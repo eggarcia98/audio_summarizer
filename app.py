@@ -35,29 +35,24 @@ def process_audio_file_endpoint():
     audio_file = ""
     url = ""
 
-    if 'audio' not in request.files:
-        return jsonify({"error": "No audio file part in the request"}), 400
-    
+
     if ('json' in request.content_type):
         body = request.get_json()
         url = body['url']
-    else:
+    elif ('audio' in request.files):
         audio_file = request.files['audio']
 
     source_audio_path = ""
 
     if not url and not audio_file:
         return jsonify({'error': 'Either a URL or an audio file must be provided.'}), 400
-    
 
     if url:
         downloaded_audio_dict = get_audio_from_youtube(url)
         source_audio_path = downloaded_audio_dict['filename']
     elif audio_file and source_audio_path == "":
         downloaded_audio_dict = get_audio_from_audio_file(audio_file)
-        source_audio_path = downloaded_audio_dict['filename']
-    
-       
+        source_audio_path = downloaded_audio_dict['filename']    
 
     # wav_audio_path = process_audio_file(source_audio_path)
     result = model.transcribe(source_audio_path)    
