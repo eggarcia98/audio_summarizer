@@ -35,6 +35,18 @@ def get_audio_from_youtube(yt_url):
     
     return downloaded_audio_dict
 
+import hashlib
+
+
+def generate_audio_hash_identificator(audio_payload):
+    """Create a new SHA-256 hash object"""
+    sha256_hash = hashlib.sha256()
+
+    # Update the hash object with the bytes of the file
+    sha256_hash.update(audio_payload)
+
+    # Return the hexadecimal representation of the hash
+    return sha256_hash.hexdigest()
 
 def get_audio_from_audio_file(audio_file):
     """Function to get an audio from audio bytes"""
@@ -48,7 +60,7 @@ def get_audio_from_audio_file(audio_file):
 
     return dict({
         'filename': destine_audio_path,
-        "id": 12124324
+        "id": generate_audio_hash_identificator(audio_bytes)
     })
 
 
