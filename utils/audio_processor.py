@@ -35,6 +35,23 @@ def get_audio_from_youtube(yt_url):
     
     return downloaded_audio_dict
 
+
+def get_audio_from_audio_file(audio_file):
+    """Function to get an audio from audio bytes"""
+    audio_bytes = audio_file.read()
+    audio_name = audio_file.filename
+
+    destine_audio_path = f"{audio_name}.mp3"
+
+    with open(destine_audio_path, 'wb') as output_file:
+        output_file.write(audio_bytes)
+
+    return dict({
+        'filename': destine_audio_path,
+        "id": 12124324
+    })
+
+
 def process_audio_file(output_audio_path):
     """Function to convert format audio to wav"""
     output_wav_audio_path = f"{output_audio_path}.wav"

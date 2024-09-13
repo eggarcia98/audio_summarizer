@@ -4,7 +4,7 @@ from datetime import datetime
 from flask import Flask, request, jsonify
 from flask_cors import cross_origin
 
-from utils.audio_processor import process_audio_file, audio_remover, get_audio_from_youtube
+from utils.audio_processor import process_audio_file, audio_remover, get_audio_from_youtube, get_audio_from_audio_file
 from services.db.queries import fetch_saved_audio_summary
 
 
@@ -32,29 +32,32 @@ def process_audio_file_endpoint():
     """Return a transcription of an audio"""
     body = {}
     
-    audio_bytes = ""
+    audio_file = ""
     url = ""
+
+    if 'audio' not in request.files:
+        return jsonify({"error": "No audio file part in the request"}), 400
     
     if ('json' in request.content_type):
         body = request.get_json()
         url = body['url']
     else:
-        audio_bytes = request.get_data()
+        audio_file = request.files['audio']
 
     source_audio_path = ""
 
-    if not url and not audio_bytes:
+    if not url and not audio_file:
         return jsonify({'error': 'Either a URL or an audio file must be provided.'}), 400
     
 
     if url:
         downloaded_audio_dict = get_audio_from_youtube(url)
         source_audio_path = downloaded_audio_dict['filename']
-    elif audio_bytes and source_audio_path == "":
-        now = datetime.now()
-        source_audio_path = f"{now}.mp3"
-        with open(source_audio_path, 'wb') as output_file:
-            output_file.write(audio_bytes)
+    elif audio_file and source_audio_path == "":
+        downloaded_audio_dict = get_audio_from_audio_file(audio_file)
+        source_audio_path = downloaded_audio_dict['filename']
+    
+       
 
     # wav_audio_path = process_audio_file(source_audio_path)
     result = model.transcribe(source_audio_path)    
