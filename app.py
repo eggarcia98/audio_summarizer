@@ -42,34 +42,30 @@ def process_audio_file_endpoint():
         audio_bytes = request.get_data()
 
     source_audio_path = ""
-    wav_audio_path = ""
 
     if not url and not audio_bytes:
         return jsonify({'error': 'Either a URL or an audio file must be provided.'}), 400
     
 
     if url:
-        source_audio_path = get_audio_from_youtube(url)
-
-    if audio_bytes and source_audio_path == "":
+        downloaded_audio_dict = get_audio_from_youtube(url)
+        source_audio_path = downloaded_audio_dict['filename']
+    elif audio_bytes and source_audio_path == "":
         now = datetime.now()
         source_audio_path = f"{now}.mp3"
         with open(source_audio_path, 'wb') as output_file:
             output_file.write(audio_bytes)
 
-    wav_audio_path = process_audio_file(source_audio_path)
-    # transcript = asyncio.run(recognize_speech(wav_audio_path))
-    result = model.transcribe(wav_audio_path)
-    
+    # wav_audio_path = process_audio_file(source_audio_path)
+    result = model.transcribe(source_audio_path)    
     audio_remover(source_audio_path)
-    audio_remover(wav_audio_path)
+    # audio_remover(wav_audio_path)
 
     parsed_segments = [
     {
         'audio_end_time': segment['end'],
         'audio_start_time': segment['start'],
-        'transcript': segment['text'].strip(),
-        'isApproved': False  # Optional field
+        'transcript': segment['text'].strip()
     }
     for segment in result['segments']
     ]

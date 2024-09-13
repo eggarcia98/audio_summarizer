@@ -9,12 +9,16 @@ import  yt_dlp
 def get_audio_from_youtube(yt_url):
     """function to get an audio from youtube"""
 
-    downloaded_filename = None
+    downloaded_audio_dict = dict({})
 
     def progress_hook(d):
-        nonlocal downloaded_filename
+        nonlocal downloaded_audio_dict
+
         if d['status'] == 'finished':
-            downloaded_filename = d['filename'].split(".")[0]
+            downloaded_audio_dict = dict({
+                'filename': f'{d["filename"].split(".")[0]}.mp3',
+                'id': d['info_dict']['id']
+            })
 
     ydl_opts = {
         'format': 'bestaudio/best',
@@ -29,7 +33,7 @@ def get_audio_from_youtube(yt_url):
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         ydl.download([yt_url])
     
-    return f'{downloaded_filename}.mp3'
+    return downloaded_audio_dict
 
 def process_audio_file(output_audio_path):
     """Function to convert format audio to wav"""
