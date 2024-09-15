@@ -7,7 +7,7 @@ from flask_cors import cross_origin
 from utils.audio_processor import process_audio_file, audio_remover, get_audio_from_youtube, get_audio_from_audio_file
 from services.db.queries import fetch_saved_audio_transcript, insert_new_audio_transcript
 
-
+import json
 import whisper
 
 # Cargar el modelo Whisper
@@ -26,17 +26,15 @@ def root_path():
     return jsonify({"data": "saved_audio_summary"}), 200
 
 @app.route('/summarize_audio', methods=['POST'])
-@cross_origin()
+@cross_origin("*")
 def process_audio_file_endpoint():
     """Return a transcription of an audio"""
-    body = {}
     
     audio_file = ""
     url = ""
 
-
-    if ('json' in request.content_type):
-        body = request.get_json()
+    if ('form-data' not in request.content_type):
+        body = json.loads(request.data)
         url = body['url']
     elif ('audio' in request.files):
         audio_file = request.files['audio']
