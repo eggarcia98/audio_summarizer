@@ -1,80 +1,62 @@
-"""Module to manage async functions"""
+"""Module to manage async functions for audio processing and summarization"""
 
-from datetime import datetime
+import json
+
 from flask import Flask, request, jsonify
 from flask_cors import cross_origin
 
-from utils.audio_processor import process_audio_file, audio_remover, get_audio_from_youtube, get_audio_from_audio_file
-from services.db.queries import fetch_saved_audio_transcript, insert_new_audio_transcript
-
-import json
 import whisper
 
-# Cargar el modelo Whisper
+from utils.audio_processor import handle_audio_input, audio_remover
+from services.speech_recognition.transcriptor import transcribe_audio
+from services.db.queries import fetch_saved_audio_transcript
+
 model = whisper.load_model("base")
-
-# Transcribir el archivo de audio
-
-
 app = Flask(__name__)
 
-@app.route("/",)
+@app.route("/", methods=['GET'])
 @cross_origin()
 def root_path():
     """GET - Root path"""
-
     return jsonify({"data": "saved_audio_summary"}), 200
 
 @app.route('/summarize_audio', methods=['POST'])
 @cross_origin("*")
 def process_audio_file_endpoint():
-    """Return a transcription of an audio"""
+    """
+    POST - Summarize an audio file or a YouTube video.
+    Transcribes audio from either a file or a URL and returns the transcript.
+    """
     
-    audio_file = ""
-    url = ""
+    audio_file = request.files.get('audio', None)
+    url = None
 
-    if ('form-data' not in request.content_type):
-        body = json.loads(request.data)
-        url = body['url']
-    elif ('audio' in request.files):
-        audio_file = request.files['audio']
-
-    source_audio_path = ""
-
+    if 'form-data' not in request.content_type:
+        try:
+            body = json.loads(request.data)
+            url = body.get('url', None)
+        except (json.JSONDecodeError, KeyError):
+            return jsonify({'error': 'Invalid request format or missing URL'}), 400
+    
     if not url and not audio_file:
         return jsonify({'error': 'Either a URL or an audio file must be provided.'}), 400
 
-    if url:
-        downloaded_audio_dict = get_audio_from_youtube(url)
-        source_audio_path = downloaded_audio_dict['filename']
-    elif audio_file and source_audio_path == "":
-        downloaded_audio_dict = get_audio_from_audio_file(audio_file)
-        source_audio_path = downloaded_audio_dict['filename']    
+    source_audio_path = handle_audio_input(url, audio_file)
+    if not source_audio_path:
+        return jsonify({'error': 'Error processing audio input.'}), 500
 
-    saved_audio_transcript = fetch_saved_audio_transcript(downloaded_audio_dict['id'])
-    if (saved_audio_transcript and len(saved_audio_transcript) > 0):
-        downloaded_audio_dict = jsonify(saved_audio_transcript)
+    transcript_data = fetch_saved_audio_transcript(source_audio_path)
+    if transcript_data:
         audio_remover(source_audio_path)
-        return downloaded_audio_dict
+        return jsonify(transcript_data), 200
 
-    # wav_audio_path = process_audio_file(source_audio_path)
-    result = model.transcribe(source_audio_path)    
+    transcript_data = transcribe_audio(model, source_audio_path)
     audio_remover(source_audio_path)
-    # audio_remover(wav_audio_path)
 
-    parsed_segments = [
-    {
-        'audio_end_time': segment['end'],
-        'audio_start_time': segment['start'],
-        'transcript': segment['text'].strip()
-    }
-    for segment in result['segments']
-    ]
+    return jsonify(transcript_data), 200
 
-    downloaded_audio_dict['transcript'] = parsed_segments
-    insert_new_audio_transcript(downloaded_audio_dict)
 
-    return downloaded_audio_dict, 200
+
 
 if __name__ == '__main__':
     app.run(debug=True, port=6030, host="0.0.0.0")
