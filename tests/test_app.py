@@ -1,9 +1,12 @@
+"""Module to test API"""
+
 import pytest
 
 from app import app
 
 @pytest.fixture
 def client():
+    """Client Test"""
     with app.test_client() as client:
         yield client  # client instance for testing
 
