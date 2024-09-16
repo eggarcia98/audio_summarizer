@@ -72,4 +72,4 @@ def handle_audio_input(url, audio_file):
     else:
         downloaded_audio = get_audio_from_audio_file(audio_file)
 
-    return downloaded_audio.get('filename', None)
+    return downloaded_audio

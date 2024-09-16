@@ -17,9 +17,9 @@ def insert_new_audio_transcript(downloaded_audio):
             VALUES (%s, %s, %s);"""
 
     with get_cursor() as cursor:
-        id_audio = downloaded_audio['id']
+        audio_id = downloaded_audio['id']
         filename = downloaded_audio['filename']
         transcript = json.dumps(downloaded_audio['transcript'])
-        cursor.execute(insert_query, (id_audio, filename, transcript))
+        cursor.execute(insert_query, (audio_id, filename, transcript))
 
         print("Record inserted successfully.")

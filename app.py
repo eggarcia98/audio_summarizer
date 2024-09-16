@@ -37,17 +37,19 @@ def process_audio_file_endpoint():
     if not url and not audio_file:
         return jsonify({'error': 'Either a URL or an audio file must be provided.'}), 400
 
-    source_audio_path = handle_audio_input(url, audio_file)
-    if not source_audio_path:
+    downloaded_audio = handle_audio_input(url, audio_file)
+    if not downloaded_audio:
         return jsonify({'error': 'Error processing audio input.'}), 500
 
-    transcript_data = fetch_saved_audio_transcript(source_audio_path)
+    audio_path = downloaded_audio.get("filename")
+    audio_id = downloaded_audio.get("id")
+    transcript_data = fetch_saved_audio_transcript(audio_id)
     if transcript_data:
-        audio_remover(source_audio_path)
+        audio_remover(downloaded_audio.get("filename"))
         return jsonify(transcript_data), 200
 
-    transcript_data = transcribe_audio(source_audio_path)
-    audio_remover(source_audio_path)
+    transcript_data = transcribe_audio(audio_path)
+    audio_remover(audio_path)
 
     return jsonify(transcript_data), 200
 
