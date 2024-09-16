@@ -15,7 +15,7 @@ app = Flask(__name__)
 @cross_origin()
 def root_path():
     """GET - Root path"""
-    return jsonify({"data": "saved_audio_summary"}), 200
+    return jsonify({"data": "root path"}), 200
 
 @app.route('/summarize_audio', methods=['POST'])
 @cross_origin("*")
