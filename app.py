@@ -5,13 +5,10 @@ import json
 from flask import Flask, request, jsonify
 from flask_cors import cross_origin
 
-import whisper
-
 from utils.audio_processor import handle_audio_input, audio_remover
 from services.speech_recognition.transcriptor import transcribe_audio
 from services.db.queries import fetch_saved_audio_transcript
 
-MODEL = whisper.load_model("base")
 app = Flask(__name__)
 
 @app.route("/", methods=['GET'])
@@ -49,7 +46,7 @@ def process_audio_file_endpoint():
         audio_remover(source_audio_path)
         return jsonify(transcript_data), 200
 
-    transcript_data = transcribe_audio(MODEL, source_audio_path)
+    transcript_data = transcribe_audio(source_audio_path)
     audio_remover(source_audio_path)
 
     return jsonify(transcript_data), 200

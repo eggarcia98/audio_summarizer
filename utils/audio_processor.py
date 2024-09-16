@@ -1,4 +1,4 @@
-"""Module to manage async functions"""
+"""Module to handle audio tasks"""
 import hashlib
 import os
 

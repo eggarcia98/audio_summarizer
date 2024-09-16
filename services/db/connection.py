@@ -1,7 +1,9 @@
-# db/connection.py
-import psycopg
+"""Module to manage database connection and transactions"""
+
 import os
 from contextlib import contextmanager
+
+import psycopg
 
 # Load environment variables for database configuration (optional, but recommended)
 DB_HOST = os.getenv('DB_HOST', 'localhost')

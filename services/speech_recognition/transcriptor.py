@@ -1,11 +1,16 @@
+"""Module to manage speech audio recognition"""
+
+import whisper
 from services.db.queries import insert_new_audio_transcript
 
-def transcribe_audio(model, audio_path):
+MODEL = whisper.load_model("base")
+
+def transcribe_audio(audio_path):
     """
     Transcribes the audio file using the Whisper model.
     Returns the parsed transcript data.
     """
-    result = model.transcribe(audio_path)
+    result = MODEL.transcribe(audio_path)
 
     parsed_segments = [
         {
@@ -20,5 +25,3 @@ def transcribe_audio(model, audio_path):
     insert_new_audio_transcript(audio_data)
 
     return audio_data
-
-
