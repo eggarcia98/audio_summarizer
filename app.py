@@ -11,7 +11,7 @@ from utils.audio_processor import handle_audio_input, audio_remover
 from services.speech_recognition.transcriptor import transcribe_audio
 from services.db.queries import fetch_saved_audio_transcript
 
-model = whisper.load_model("base")
+MODEL = whisper.load_model("base")
 app = Flask(__name__)
 
 @app.route("/", methods=['GET'])
@@ -27,7 +27,6 @@ def process_audio_file_endpoint():
     POST - Summarize an audio file or a YouTube video.
     Transcribes audio from either a file or a URL and returns the transcript.
     """
-    
     audio_file = request.files.get('audio', None)
     url = None
 
@@ -37,7 +36,7 @@ def process_audio_file_endpoint():
             url = body.get('url', None)
         except (json.JSONDecodeError, KeyError):
             return jsonify({'error': 'Invalid request format or missing URL'}), 400
-    
+
     if not url and not audio_file:
         return jsonify({'error': 'Either a URL or an audio file must be provided.'}), 400
 
@@ -50,13 +49,10 @@ def process_audio_file_endpoint():
         audio_remover(source_audio_path)
         return jsonify(transcript_data), 200
 
-    transcript_data = transcribe_audio(model, source_audio_path)
+    transcript_data = transcribe_audio(MODEL, source_audio_path)
     audio_remover(source_audio_path)
 
     return jsonify(transcript_data), 200
-
-
-
 
 if __name__ == '__main__':
     app.run(debug=True, port=6030, host="0.0.0.0")

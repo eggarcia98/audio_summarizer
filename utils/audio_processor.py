@@ -11,7 +11,6 @@ def generate_audio_hash_identificator(audio_payload):
 
     return sha256_hash.hexdigest()
 
-
 def get_audio_from_youtube(yt_url):
     """function to get an audio from youtube"""
 
@@ -35,10 +34,10 @@ def get_audio_from_youtube(yt_url):
         }],
         'progress_hooks': [progress_hook],
     }
-    
+
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         ydl.download([yt_url])
-    
+
     return downloaded_audio_dict
 
 def get_audio_from_audio_file(audio_file):
