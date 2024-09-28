@@ -1,20 +1,29 @@
-"""Module to manage async functions"""
-import asyncio
+"""Module to handle audio tasks"""
+import hashlib
 import os
-from operator import itemgetter
-from pydub import AudioSegment
-import  yt_dlp
- # client to many multimedia portals
+
+import yt_dlp
+
+def generate_audio_hash_identificator(audio_payload):
+    """Create a new SHA-256 hash object"""
+    sha256_hash = hashlib.sha256()
+    sha256_hash.update(audio_payload)
+
+    return sha256_hash.hexdigest()
 
 def get_audio_from_youtube(yt_url):
     """function to get an audio from youtube"""
 
-    downloaded_filename = None
+    downloaded_audio_dict = dict({})
 
     def progress_hook(d):
-        nonlocal downloaded_filename
+        nonlocal downloaded_audio_dict
+
         if d['status'] == 'finished':
-            downloaded_filename = d['filename'].split(".")[0]
+            downloaded_audio_dict = dict({
+                'filename': f'{d["filename"].split(".")[0]}.mp3',
+                'id': d['info_dict']['id']
+            })
 
     ydl_opts = {
         'format': 'bestaudio/best',
@@ -25,45 +34,26 @@ def get_audio_from_youtube(yt_url):
         }],
         'progress_hooks': [progress_hook],
     }
-    
+
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         ydl.download([yt_url])
-    
-    return f'{downloaded_filename}.mp3'
 
-def process_audio_file(output_audio_path):
-    """Function to convert format audio to wav"""
-    output_wav_audio_path = f"{output_audio_path}.wav"
+    return downloaded_audio_dict
 
-    audio_no_wav = AudioSegment.from_file(output_audio_path)
-    audio_no_wav.export(output_wav_audio_path, format="wav", codec="pcm_s16le")
-   
-    return output_wav_audio_path
+def get_audio_from_audio_file(audio_file):
+    """Function to get an audio from audio bytes"""
+    audio_bytes = audio_file.read()
+    audio_name = audio_file.filename
 
-def audio_splitter(audio, chunk_length_ms=30000):
-    """Function to split an audio into chunks with a specific length in ms"""
-    audio_chunks = []
+    destine_audio_path = f"{audio_name}"
 
-    for start_ms in range(0, len(audio), chunk_length_ms):
-        end_ms = min(start_ms + chunk_length_ms, len(audio))
-        audio_content = audio[start_ms:end_ms]
-        start_time = start_ms / 1000
-        chunk_data = dict({"start_time": start_time, "audio_content": audio_content})
-        audio_chunks.append(chunk_data)
+    with open(destine_audio_path, 'wb') as output_file:
+        output_file.write(audio_bytes)
 
-    return audio_chunks
-
-def queue_audios_chunks(audio_chunks, promise_recognize_speech):
-    """Function that create a list of audios chunks pending to process"""
-    audios_to_process = []
-
-    for audio_chunk in audio_chunks:
-        audio_content, start_time = itemgetter('audio_content', 'start_time')(audio_chunk)
-        task = asyncio.create_task(promise_recognize_speech(audio_content, start_time))
-        audios_to_process.append(task)
-
-    return audios_to_process
-
+    return dict({
+        'filename': destine_audio_path,
+        "id": generate_audio_hash_identificator(audio_bytes)
+    })
 
 def audio_remover(audio_path):
     """Function to remove files"""
@@ -71,3 +61,15 @@ def audio_remover(audio_path):
         os.remove(audio_path)
     else:
         print("The file does not exist")
+
+def handle_audio_input(url, audio_file):
+    """
+    Handle fetching or processing of audio input from a URL or file.
+    Returns the path to the audio file.
+    """
+    if url:
+        downloaded_audio = get_audio_from_youtube(url)
+    else:
+        downloaded_audio = get_audio_from_audio_file(audio_file)
+
+    return downloaded_audio

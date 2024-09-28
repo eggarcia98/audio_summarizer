@@ -1,56 +1,63 @@
-"""Module to manage async functions"""
-import asyncio
+"""Module to manage async functions for audio processing and summarization"""
 
-from datetime import datetime
-from flask import Flask, request, jsonify
+import json
+
+from flask import Flask, jsonify, request
 from flask_cors import cross_origin
 
-from utils.audio_processor import process_audio_file, audio_remover, get_audio_from_youtube
-from utils.transcript_processor import merge_overlapping_transcripts
-from services.speech_recognition.recognition import recognize_speech
+from services.db.queries import fetch_saved_audio_transcript
+from services.speech_recognition.transcriptor import transcribe_audio
+from utils.audio_processor import audio_remover, handle_audio_input
 
 app = Flask(__name__)
 
 
-@app.route('/summarize_audio', methods=['POST'])
+@app.route("/", methods=["GET"])
 @cross_origin()
+def root_path():
+    """GET - Root path"""
+    return jsonify({"data": "root path"}), 200
+
+
+@app.route("/summarize_audio", methods=["POST"])
+@cross_origin("*")
 def process_audio_file_endpoint():
-    """Return a transcription of an audio"""
-    body = {}
-    
-    audio_bytes = ""
-    url = ""
-    
-    if ('json' in request.content_type):
-        body = request.get_json()
-        url = body['url']
-    else:
-        audio_bytes = request.get_data()
+    """
+    POST - Summarize an audio file or a YouTube video.
+    Transcribes audio from either a file or a URL and returns the transcript.
+    """
+    audio_file = request.files.get("audio", None)
+    url = None
 
-    source_audio_path = ""
-    wav_audio_path = ""
+    if "form-data" not in request.content_type:
+        try:
+            body = json.loads(request.data)
+            url = body.get("url", None)
+        except (json.JSONDecodeError, KeyError):
+            return jsonify({"error": "Invalid request format or missing URL"}), 400
 
-    if not url and not audio_bytes:
-        return jsonify({'error': 'Either a URL or an audio file must be provided.'}), 400
-    
+    if not url and not audio_file:
+        return (
+            jsonify({"error": "Either a URL or an audio file must be provided."}),
+            400,
+        )
 
-    if url:
-        source_audio_path = get_audio_from_youtube(url)
+    downloaded_audio = handle_audio_input(url, audio_file)
+    if not downloaded_audio:
+        return jsonify({"error": "Error processing audio input."}), 500
 
-    if audio_bytes and source_audio_path == "":
-        now = datetime.now()
-        source_audio_path = f"{now}.mp3"
-        with open(source_audio_path, 'wb') as output_file:
-            output_file.write(audio_bytes)
+    audio_path = downloaded_audio.get("filename")
+    audio_id = downloaded_audio.get("id")
+    transcript_data = fetch_saved_audio_transcript(audio_id)
+    if transcript_data:
+        audio_remover(downloaded_audio.get("filename"))
+        return jsonify(transcript_data), 200
 
-    wav_audio_path = process_audio_file(source_audio_path)
-    transcript = asyncio.run(recognize_speech(wav_audio_path))
-    
-    audio_remover(source_audio_path)
-    audio_remover(wav_audio_path)
+    transcript_data = transcribe_audio(audio_path)
+    audio_remover(audio_path)
 
-    merged_transcript = merge_overlapping_transcripts(transcript)
-    return jsonify({'data': merged_transcript}), 200
+    return jsonify(transcript_data), 200
 
-if __name__ == '__main__':
-    app.run(debug=True, port=6030)
+
+if __name__ == "__main__":
+    app.run(debug=True, port=6030, host="0.0.0.0")
