@@ -60,4 +60,4 @@ def process_audio_file_endpoint():
 
 
 if __name__ == "__main__":
-    app.run(debug=True, port=6030, host="0.0.0.0")
+    app.run(port=8080, host="0.0.0.0")
