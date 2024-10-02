@@ -8,4 +8,5 @@ RUN apt-get update && apt-get install -y libpq-dev
 # Install dependencies within the virtual environment
 RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
-CMD ["python3", "app.py"]
+EXPOSE 8080
+CMD ["gunicorn"  , "-b", "0.0.0.0:8080", "app:app"]
