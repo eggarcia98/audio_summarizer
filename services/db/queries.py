@@ -10,6 +10,7 @@ def fetch_saved_audio_transcript(audio_file_id):
         cursor.execute(query)
         return cursor.fetchone()
 
+
 def insert_new_audio_transcript(downloaded_audio):
     """Function to save a new transcripted audio to the database"""
     insert_query = """
