@@ -5,6 +5,7 @@ COPY . /app
 RUN python3 -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 RUN apt-get update && apt-get install -y libpq-dev
+RUN  apt-get install -y ffmpeg
 # Install dependencies within the virtual environment
 RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
