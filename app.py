@@ -53,7 +53,7 @@ def process_audio_file_endpoint():
         audio_remover(downloaded_audio.get("filename"))
         return jsonify(transcript_data), 200
 
-    transcript_data = transcribe_audio(audio_path)
+    transcript_data = transcribe_audio(audio_path, downloaded_audio)
     audio_remover(audio_path)
 
     return jsonify(transcript_data), 200
