@@ -4,7 +4,7 @@ import whisper
 
 from services.db.queries import insert_new_audio_transcript
 
-MODEL = whisper.load_model("base")
+MODEL = whisper.load_model("./tiny.pt")
 
 
 def transcribe_audio(audio_path, downloaded_audio):
