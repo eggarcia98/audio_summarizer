@@ -5,7 +5,10 @@ import json
 from flask import Flask, jsonify, request
 from flask_cors import cross_origin
 
-from services.db.queries import fetch_saved_audio_transcript
+from services.db.queries import (
+    fetch_saved_audio_transcript,
+    insert_new_audio_transcript,
+)
 from services.speech_recognition.transcriptor import transcribe_audio
 from utils.audio_processor import audio_remover, handle_audio_input
 
@@ -53,10 +56,14 @@ def process_audio_file_endpoint():
         audio_remover(downloaded_audio.get("filename"))
         return jsonify(transcript_data), 200
 
-    transcript_data = transcribe_audio(audio_path, downloaded_audio)
+    transcript = transcribe_audio(audio_path, downloaded_audio)
+
+    downloaded_audio["transcript"] = transcript
+    insert_new_audio_transcript(downloaded_audio)
+
     audio_remover(audio_path)
 
-    return jsonify(transcript_data), 200
+    return jsonify(downloaded_audio), 200
 
 
 if __name__ == "__main__":
