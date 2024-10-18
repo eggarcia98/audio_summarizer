@@ -68,7 +68,7 @@ def get_youtube_audio_id(yt_url):
     """Getting youtube audio identificator"""
     downloaded_audio_dict = dict({})
 
-    ydl_opts = set_youtube_download(downloaded_audio_dict)
+    ydl_opts = set_youtube__config_downloader(downloaded_audio_dict)
 
     # Extract metadata without downloading
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -80,7 +80,7 @@ def get_audio_from_youtube(yt_url):
     """function to get an audio from youtube"""
 
     downloaded_audio_dict = dict({})
-    ydl_opts = set_youtube_download(downloaded_audio_dict)
+    ydl_opts = set_youtube__config_downloader(downloaded_audio_dict)
 
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         ydl.download([yt_url])
