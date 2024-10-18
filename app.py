@@ -22,6 +22,20 @@ def root_path():
     return jsonify({"data": "root path"}), 200
 
 
+def is_json_request(req):
+    """Check if the request content type is JSON."""
+    return "form-data" not in req.content_type
+
+
+def handle_json_request(req):
+    """Parse and validate the JSON request body."""
+    try:
+        body = json.loads(req.data)
+        return body.get("url", None)
+    except (json.JSONDecodeError, KeyError):
+        raise ValueError("Invalid request format or missing URL")
+
+
 @app.route("/summarize_audio", methods=["POST"])
 @cross_origin("*")
 def process_audio_file_endpoint():
@@ -29,23 +43,23 @@ def process_audio_file_endpoint():
     POST - Summarize an audio file or a YouTube video.
     Transcribes audio from either a file or a URL and returns the transcript.
     """
-    audio_file = request.files.get("audio", None)
-    url = None
+    audio_source = None
 
-    if "form-data" not in request.content_type:
-        try:
-            body = json.loads(request.data)
-            url = body.get("url", None)
-        except (json.JSONDecodeError, KeyError):
-            return jsonify({"error": "Invalid request format or missing URL"}), 400
+    try:
+        if is_json_request(request):
+            audio_source = handle_json_request(request)
+        else:
+            audio_source = request.files.get("audio", None)
+    except ValueError as e:
+        return jsonify({"error": e}), 400
 
-    if not url and not audio_file:
+    if not audio_source:
         return (
             jsonify({"error": "Either a URL or an audio file must be provided."}),
             400,
         )
 
-    downloaded_audio = handle_audio_input(url, audio_file)
+    downloaded_audio = handle_audio_input(audio_source, is_json_request(request))
     if not downloaded_audio:
         return jsonify({"error": "Error processing audio input."}), 500
 
@@ -56,7 +70,7 @@ def process_audio_file_endpoint():
         audio_remover(downloaded_audio.get("filename"))
         return jsonify(transcript_data), 200
 
-    transcript = transcribe_audio(audio_path, downloaded_audio)
+    transcript = transcribe_audio(audio_path)
 
     downloaded_audio["transcript"] = transcript
     insert_new_audio_transcript(downloaded_audio)

@@ -83,14 +83,14 @@ def audio_remover(audio_path):
         print("The file does not exist")
 
 
-def handle_audio_input(url, audio_file):
+def handle_audio_input(audio_source, is_json_request):
     """
     Handle fetching or processing of audio input from a URL or file.
     Returns the path to the audio file.
     """
-    if url:
-        downloaded_audio = get_audio_from_youtube(url)
+    if is_json_request:
+        downloaded_audio = get_audio_from_youtube(audio_source)
     else:
-        downloaded_audio = get_audio_from_audio_file(audio_file)
+        downloaded_audio = get_audio_from_audio_file(audio_source)
 
     return downloaded_audio
