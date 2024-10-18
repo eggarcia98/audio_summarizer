@@ -64,11 +64,9 @@ def process_audio_file_endpoint():
         )
 
     audio_id = get_audio_identificator(audio_source, is_json_request(request))
-    print(audio_id)
     transcript_data = fetch_saved_audio_transcript(audio_id)
     if transcript_data:
         audio_remover(transcript_data.get("filename"))
-        print("founded")
         return jsonify(transcript_data), 200
 
     downloaded_audio = handle_audio_input(audio_source, is_json_request(request))
@@ -76,9 +74,7 @@ def process_audio_file_endpoint():
         return jsonify({"error": "Error processing audio input."}), 500
 
     audio_path = downloaded_audio.get("filename")
-
     transcript = transcribe_audio(audio_path)
-
     downloaded_audio["transcript"] = transcript
     insert_new_audio_transcript(downloaded_audio)
 
