@@ -14,6 +14,47 @@ def generate_audio_hash_identificator(audio_payload):
     return sha256_hash.hexdigest()
 
 
+def get_audio_identificator(audio_source, is_json_request):
+    """
+    Get audio ID, necessary to use it to check if it already
+    existed on database
+    """
+
+    if is_json_request:
+        return get_youtube_audio_id(audio_source)
+
+    return generate_audio_hash_identificator(audio_source.read())
+
+
+def get_youtube_audio_id(yt_url):
+    """Getting youtube audio identificator"""
+
+    ydl_opts = {
+        "format": "bestaudio/best",
+        "restrictfilenames": True,
+        "noplaylist": True,
+        "extractor_retries": 4,
+        "nocheckcertificate": True,
+        "ignoreerrors": False,
+        "logtostderr": False,
+        "quiet": True,
+        "no_warnings": True,
+        "source_address": "0.0.0.0",
+        "postprocessors": [
+            {
+                "key": "FFmpegExtractAudio",
+                "preferredcodec": "mp3",
+                "preferredquality": "192",
+            }
+        ],
+    }
+
+    # Extract metadata without downloading
+    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+        info_dict = ydl.extract_info(yt_url, download=False)
+        return info_dict.get("id")
+
+
 def get_audio_from_youtube(yt_url):
     """function to get an audio from youtube"""
 

@@ -10,7 +10,11 @@ from services.db.queries import (
     insert_new_audio_transcript,
 )
 from services.speech_recognition.transcriptor import transcribe_audio
-from utils.audio_processor import audio_remover, handle_audio_input
+from utils.audio_processor import (
+    audio_remover,
+    get_audio_identificator,
+    handle_audio_input,
+)
 
 app = Flask(__name__)
 
@@ -32,8 +36,8 @@ def handle_json_request(req):
     try:
         body = json.loads(req.data)
         return body.get("url", None)
-    except (json.JSONDecodeError, KeyError):
-        raise ValueError("Invalid request format or missing URL")
+    except (json.JSONDecodeError, KeyError) as exc:
+        raise ValueError("Invalid request format or missing URL") from exc
 
 
 @app.route("/summarize_audio", methods=["POST"])
@@ -59,16 +63,19 @@ def process_audio_file_endpoint():
             400,
         )
 
+    audio_id = get_audio_identificator(audio_source, is_json_request(request))
+    print(audio_id)
+    transcript_data = fetch_saved_audio_transcript(audio_id)
+    if transcript_data:
+        audio_remover(transcript_data.get("filename"))
+        print("founded")
+        return jsonify(transcript_data), 200
+
     downloaded_audio = handle_audio_input(audio_source, is_json_request(request))
     if not downloaded_audio:
         return jsonify({"error": "Error processing audio input."}), 500
 
     audio_path = downloaded_audio.get("filename")
-    audio_id = downloaded_audio.get("id")
-    transcript_data = fetch_saved_audio_transcript(audio_id)
-    if transcript_data:
-        audio_remover(downloaded_audio.get("filename"))
-        return jsonify(transcript_data), 200
 
     transcript = transcribe_audio(audio_path)
 
