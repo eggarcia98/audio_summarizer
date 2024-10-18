@@ -6,7 +6,7 @@ import os
 import yt_dlp
 
 
-def set_youtube_download(downloaded_audio_dict):
+def set_youtube__config_downloader(downloaded_audio_dict):
     """Youtube download options"""
 
     def progress_hook(d):
