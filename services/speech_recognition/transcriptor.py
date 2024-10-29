@@ -10,6 +10,7 @@ def transcribe_audio(audio_path):
     Transcribes the audio file using the Whisper model.
     Returns the parsed transcript data.
     """
+
     result = MODEL.transcribe(audio_path)
 
     parsed_segments = [

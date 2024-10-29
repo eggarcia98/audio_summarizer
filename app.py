@@ -76,10 +76,14 @@ def process_audio_file_endpoint():
 
     audio_filename_result = downloaded_audio.get("filename")
     transcript = transcribe_audio(audio_filename_result)
+    fragments_size = len(transcript)
+
     downloaded_audio["transcript"] = transcript
+    downloaded_audio["size"] = fragments_size
+
     audio_remover(audio_filename_result)
 
-    insert_new_audio_transcript(downloaded_audio)
+    # insert_new_audio_transcript(downloaded_audio)
     return jsonify(downloaded_audio), 200
 
 
