@@ -9,6 +9,7 @@ from services.db.queries import (
     fetch_saved_audio_transcript,
     insert_new_audio_transcript,
 )
+from services.db import init_db
 from services.speech_recognition.transcriptor import transcribe_audio
 from utils.audio_processor import (
     audio_remover,
@@ -17,6 +18,11 @@ from utils.audio_processor import (
 )
 
 app = Flask(__name__)
+
+
+
+# Initialize the database
+init_db(app)
 
 
 @app.route("/", methods=["GET"])
