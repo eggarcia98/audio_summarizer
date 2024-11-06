@@ -4,6 +4,18 @@ import json
 
 from services.db.connection import get_cursor
 
+from .models.audio_transcript import AudioTranscript
+
+
+def get_all_audio_transcripts():
+    """Get all saved audio transcript from Database"""
+    return AudioTranscript.select_all_audio_transcript(
+        AudioTranscript.id,
+        AudioTranscript.duration,
+        AudioTranscript.filename,
+        AudioTranscript.source_url,
+    )
+
 
 def fetch_saved_audio_transcript(audio_file_id):
     """Function to fetch all saved audio trancriptions"""
@@ -24,5 +36,7 @@ def insert_new_audio_transcript(downloaded_audio):
         filename = downloaded_audio["filename"]
         transcript = json.dumps(downloaded_audio["transcript"])
         cursor.execute(insert_query, (audio_id, filename, transcript))
+
+        print("Record inserted successfully.")
 
         print("Record inserted successfully.")

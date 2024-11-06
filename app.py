@@ -5,11 +5,12 @@ import json
 from flask import Flask, jsonify, request
 from flask_cors import cross_origin
 
+from services.db import init_db
 from services.db.queries import (
     fetch_saved_audio_transcript,
+    get_all_audio_transcripts,
     insert_new_audio_transcript,
 )
-from services.db import init_db
 from services.speech_recognition.transcriptor import transcribe_audio
 from utils.audio_processor import (
     audio_remover,
@@ -20,7 +21,6 @@ from utils.audio_processor import (
 app = Flask(__name__)
 
 
-
 # Initialize the database
 init_db(app)
 
@@ -29,7 +29,22 @@ init_db(app)
 @cross_origin()
 def root_path():
     """GET - Root path"""
-    return jsonify({"data": "root path"}), 200
+    return jsonify({"data": "root"}), 200
+
+
+@app.route("/saved_audio_transcripts", methods=["GET"])
+@cross_origin()
+def get_saved_audio_transcripts():
+    """GET - Return list of saved audio transcripts"""
+    audio_transcripts = get_all_audio_transcripts()
+
+    print(audio_transcripts)
+
+    parsed_result = [
+        audio_transcript.to_dict() for audio_transcript in audio_transcripts
+    ]
+
+    return jsonify({"data": parsed_result})
 
 
 def is_json_request(req):

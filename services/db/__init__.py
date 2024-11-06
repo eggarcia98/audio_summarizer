@@ -2,18 +2,21 @@
 
 import os
 
+from dotenv import load_dotenv
 from flask_sqlalchemy import SQLAlchemy
 
+db = SQLAlchemy()
+
+load_dotenv()
 DB_HOST = os.getenv("DB_HOST", "localhost")
 DB_NAME = os.getenv("DB_NAME", "mydatabase")
 DB_USER = os.getenv("DB_USER", "myuser")
 DB_PASSWORD = os.getenv("DB_PASSWORD", "mypassword")
 
-db = SQLAlchemy()
-
 
 def init_db(app):
     """Initialize the database with the Flask app."""
+    print("AA: ", DB_HOST)
 
     # Configure the database URI (replace with your actual database URI)
     app.config["SQLALCHEMY_DATABASE_URI"] = (
