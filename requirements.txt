@@ -57,7 +57,7 @@ pipreqs==0.5.0
 platformdirs==4.3.3
 pluggy==1.5.0
 prompt_toolkit==3.0.48
-psycopg==3.2.1
+psycopg2==2.9.10
 ptyprocess==0.7.0
 pure_eval==0.2.3
 pycryptodomex==3.20.0
@@ -65,8 +65,9 @@ pydub==0.25.1
 Pygments==2.18.0
 pytest==8.3.3
 python-dateutil==2.9.0.post0
+python-dotenv==1.0.1
 pyzmq==26.2.0
-referencing==0.35.1 
+referencing==0.35.1
 regex==2024.9.11
 requests==2.32.2
 rpds-py==0.20.0
