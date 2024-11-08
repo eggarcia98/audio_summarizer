@@ -39,13 +39,7 @@ def get_saved_audio_transcripts():
     """GET - Return list of saved audio transcripts"""
     audio_transcripts = get_all_audio_transcripts()
 
-    print(audio_transcripts)
-
-    parsed_result = [
-        audio_transcript.to_dict() for audio_transcript in audio_transcripts
-    ]
-
-    return jsonify({"data": parsed_result})
+    return jsonify({"data": audio_transcripts})
 
 
 def is_json_request(req):
