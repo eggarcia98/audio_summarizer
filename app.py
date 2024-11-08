@@ -5,13 +5,16 @@ import json
 from flask import Flask, jsonify, request
 from flask_cors import cross_origin
 
+from services.db import init_db
 from services.db.queries import (
-    fetch_saved_audio_transcript,
-    insert_new_audio_transcript,
+    add_new_audio_transcript,
+    get_all_audio_transcripts,
+    get_single_audio_transcript,
 )
 from services.speech_recognition.transcriptor import transcribe_audio
 from utils.audio_processor import (
     audio_remover,
+    get_audio_duration,
     get_audio_identificator,
     handle_audio_input,
 )
@@ -19,11 +22,30 @@ from utils.audio_processor import (
 app = Flask(__name__)
 
 
+# Initialize the database
+init_db(app)
+
+
 @app.route("/", methods=["GET"])
 @cross_origin()
 def root_path():
     """GET - Root path"""
-    return jsonify({"data": "root path"}), 200
+    return jsonify({"data": "root"}), 200
+
+
+@app.route("/saved_audio_transcripts", methods=["GET"])
+@cross_origin()
+def get_saved_audio_transcripts():
+    """GET - Return list of saved audio transcripts"""
+    audio_transcripts = get_all_audio_transcripts()
+
+    print(audio_transcripts)
+
+    parsed_result = [
+        audio_transcript.to_dict() for audio_transcript in audio_transcripts
+    ]
+
+    return jsonify({"data": parsed_result})
 
 
 def is_json_request(req):
@@ -64,7 +86,10 @@ def process_audio_file_endpoint():
         )
 
     audio_id = get_audio_identificator(audio_source, is_json_request(request))
-    transcript_data = fetch_saved_audio_transcript(audio_id)
+    duration = get_audio_duration(audio_source, is_json_request(request))
+    source_url = audio_source if is_json_request(request) else ""
+
+    transcript_data = get_single_audio_transcript(audio_id)
     if transcript_data:
         audio_remover(transcript_data.get("filename"))
         return jsonify(transcript_data), 200
@@ -80,10 +105,12 @@ def process_audio_file_endpoint():
 
     downloaded_audio["transcript"] = transcript
     downloaded_audio["size"] = fragments_size
+    downloaded_audio["duration"] = duration
+    downloaded_audio["source_url"] = source_url
 
     audio_remover(audio_filename_result)
 
-    # insert_new_audio_transcript(downloaded_audio)
+    add_new_audio_transcript(downloaded_audio)
     return jsonify(downloaded_audio), 200
 
 

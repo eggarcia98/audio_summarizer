@@ -53,12 +53,22 @@ def get_audio_identificator(audio_source, is_json_request):
     """
 
     if is_json_request:
-        return get_youtube_audio_id(audio_source)
+        return get_youtube_audio_metadata(audio_source).get("id")
 
     return generate_audio_hash_identificator(audio_source.read())
 
 
-def get_youtube_audio_id(yt_url):
+def get_audio_duration(audio_source, is_json_request):
+    """Get audio Duration, necessary to use it to chek if it already existed
+    on database"""
+
+    if is_json_request:
+        return get_youtube_audio_metadata(audio_source).get("duration_string")
+
+    return ""
+
+
+def get_youtube_audio_metadata(yt_url):
     """Get youtube audio identificator from youtube metadata"""
     downloaded_audio_dict = dict({})
 
@@ -67,7 +77,7 @@ def get_youtube_audio_id(yt_url):
     # Extract metadata without downloading
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         info_dict = ydl.extract_info(yt_url, download=False)
-        return info_dict.get("id")
+        return info_dict
 
 
 def get_audio_from_youtube(yt_url):

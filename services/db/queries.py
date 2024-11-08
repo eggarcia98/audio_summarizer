@@ -1,26 +1,38 @@
 """Module to define Database Transactions"""
 
 import json
-from services.db.connection import get_cursor
 
-def fetch_saved_audio_transcript(audio_file_id):
+from .models.audio_transcript import AudioTranscript
+
+
+def get_all_audio_transcripts():
+    """Get all saved audio transcript from Database"""
+    return AudioTranscript.select_all_audio_transcript(
+        AudioTranscript.id,
+        AudioTranscript.duration,
+        AudioTranscript.filename,
+        AudioTranscript.source_url,
+    )
+
+
+def get_single_audio_transcript(audio_file_id):
     """Function to fetch all saved audio trancriptions"""
-    query = f'SELECT * FROM audio_transcripts WHERE id = \'{audio_file_id}\''
-    with get_cursor() as cursor:
-        cursor.execute(query)
-        return cursor.fetchone()
+
+    required_audio = AudioTranscript(id=audio_file_id)
+    result = required_audio.select_single_audio_transcript(audio_file_id)
+
+    return result[0].to_dict() if result else None
 
 
-def insert_new_audio_transcript(downloaded_audio):
+def add_new_audio_transcript(downloaded_audio):
     """Function to save a new transcripted audio to the database"""
-    insert_query = """
-            INSERT INTO audio_transcripts (id, filename, transcript)
-            VALUES (%s, %s, %s);"""
 
-    with get_cursor() as cursor:
-        audio_id = downloaded_audio['id']
-        filename = downloaded_audio['filename']
-        transcript = json.dumps(downloaded_audio['transcript'])
-        cursor.execute(insert_query, (audio_id, filename, transcript))
+    new_audio_transcript = AudioTranscript(
+        id=downloaded_audio["id"],
+        filename=downloaded_audio["filename"],
+        transcript=json.dumps(downloaded_audio["transcript"]),
+        source_url=downloaded_audio["source_url"],
+        duration=downloaded_audio["duration"],
+    )
 
-        print("Record inserted successfully.")
+    return AudioTranscript.insert_new_audio_transcript(new_audio_transcript)
