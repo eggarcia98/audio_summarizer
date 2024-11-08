@@ -1,5 +1,7 @@
 """Audio Transcriptions Model Class"""
 
+from sqlalchemy import select
+
 from services.db import db
 
 
@@ -34,6 +36,14 @@ class AudioTranscript(db.Model):
         results = cls.query.with_entities(*columns).all()
         column_names = [col.key for col in columns]  # Get column names from columns
         return [dict(zip(column_names, row)) for row in results]
+
+    @classmethod
+    def select_single_audio_transcript(cls):
+        """Select single audio transcrip filter by id"""
+
+        query = select(AudioTranscript).where(AudioTranscript.id == cls.id)
+        result = db.session.execute(query).first()[0]
+        return result
 
     @classmethod
     def insert_new_audio_transcript(cls, audio_transcript_data):

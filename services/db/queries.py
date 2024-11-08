@@ -2,8 +2,6 @@
 
 import json
 
-from services.db.connection import get_cursor
-
 from .models.audio_transcript import AudioTranscript
 
 
@@ -17,12 +15,13 @@ def get_all_audio_transcripts():
     )
 
 
-def fetch_saved_audio_transcript(audio_file_id):
+def get_single_audio_transcript(audio_file_id):
     """Function to fetch all saved audio trancriptions"""
-    query = f"SELECT * FROM audio_transcripts WHERE id = '{audio_file_id}'"
-    with get_cursor() as cursor:
-        cursor.execute(query)
-        return cursor.fetchone()
+
+    required_audio = AudioTranscript(id=audio_file_id)
+    result = required_audio.select_single_audio_transcript()
+
+    return result.to_dict()
 
 
 def add_new_audio_transcript(downloaded_audio):
