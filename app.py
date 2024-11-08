@@ -7,9 +7,9 @@ from flask_cors import cross_origin
 
 from services.db import init_db
 from services.db.queries import (
+    add_new_audio_transcript,
     fetch_saved_audio_transcript,
     get_all_audio_transcripts,
-    insert_new_audio_transcript,
 )
 from services.speech_recognition.transcriptor import transcribe_audio
 from utils.audio_processor import (
@@ -104,7 +104,7 @@ def process_audio_file_endpoint():
 
     audio_remover(audio_filename_result)
 
-    # insert_new_audio_transcript(downloaded_audio)
+    add_new_audio_transcript(downloaded_audio)
     return jsonify(downloaded_audio), 200
 
 

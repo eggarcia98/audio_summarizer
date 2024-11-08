@@ -25,18 +25,13 @@ def fetch_saved_audio_transcript(audio_file_id):
         return cursor.fetchone()
 
 
-def insert_new_audio_transcript(downloaded_audio):
+def add_new_audio_transcript(downloaded_audio):
     """Function to save a new transcripted audio to the database"""
-    insert_query = """
-            INSERT INTO audio_transcripts (id, filename, transcript)
-            VALUES (%s, %s, %s);"""
 
-    with get_cursor() as cursor:
-        audio_id = downloaded_audio["id"]
-        filename = downloaded_audio["filename"]
-        transcript = json.dumps(downloaded_audio["transcript"])
-        cursor.execute(insert_query, (audio_id, filename, transcript))
+    new_audio_transcript = AudioTranscript(
+        id=downloaded_audio["id"],
+        filename=downloaded_audio["filename"],
+        transcript=json.dumps(downloaded_audio["transcript"]),
+    )
 
-        print("Record inserted successfully.")
-
-        print("Record inserted successfully.")
+    return AudioTranscript.insert_new_audio_transcript(new_audio_transcript)

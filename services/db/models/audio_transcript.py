@@ -30,4 +30,16 @@ class AudioTranscript(db.Model):
     @classmethod
     def select_all_audio_transcript(cls, *columns):
         """Get all the audio transcriptions saved"""
-        return cls.query.with_entities(*columns).all()
+
+        results = cls.query.with_entities(*columns).all()
+        column_names = [col.key for col in columns]  # Get column names from columns
+        return [dict(zip(column_names, row)) for row in results]
+
+    @classmethod
+    def insert_new_audio_transcript(cls, audio_transcript_data):
+        """Function to save a new transcripted audio to the database"""
+
+        db.session.add(audio_transcript_data)
+        db.session.commit()
+
+        print("Record inserted successfully.")
