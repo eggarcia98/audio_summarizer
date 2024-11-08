@@ -8,12 +8,13 @@ from flask_cors import cross_origin
 from services.db import init_db
 from services.db.queries import (
     add_new_audio_transcript,
-    get_single_audio_transcript,
     get_all_audio_transcripts,
+    get_single_audio_transcript,
 )
 from services.speech_recognition.transcriptor import transcribe_audio
 from utils.audio_processor import (
     audio_remover,
+    get_audio_duration,
     get_audio_identificator,
     handle_audio_input,
 )
@@ -85,6 +86,9 @@ def process_audio_file_endpoint():
         )
 
     audio_id = get_audio_identificator(audio_source, is_json_request(request))
+    duration = get_audio_duration(audio_source, is_json_request(request))
+    source_url = audio_source if is_json_request(request) else ""
+
     transcript_data = get_single_audio_transcript(audio_id)
     if transcript_data:
         audio_remover(transcript_data.get("filename"))
@@ -101,6 +105,8 @@ def process_audio_file_endpoint():
 
     downloaded_audio["transcript"] = transcript
     downloaded_audio["size"] = fragments_size
+    downloaded_audio["duration"] = duration
+    downloaded_audio["source_url"] = source_url
 
     audio_remover(audio_filename_result)
 

@@ -21,7 +21,7 @@ def get_single_audio_transcript(audio_file_id):
     required_audio = AudioTranscript(id=audio_file_id)
     result = required_audio.select_single_audio_transcript(audio_file_id)
 
-    return result[0].to_dict() if result else  None
+    return result[0].to_dict() if result else None
 
 
 def add_new_audio_transcript(downloaded_audio):
@@ -31,6 +31,8 @@ def add_new_audio_transcript(downloaded_audio):
         id=downloaded_audio["id"],
         filename=downloaded_audio["filename"],
         transcript=json.dumps(downloaded_audio["transcript"]),
+        source_url=downloaded_audio["source_url"],
+        duration=downloaded_audio["duration"],
     )
 
     return AudioTranscript.insert_new_audio_transcript(new_audio_transcript)
