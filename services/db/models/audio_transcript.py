@@ -38,11 +38,12 @@ class AudioTranscript(db.Model):
         return [dict(zip(column_names, row)) for row in results]
 
     @classmethod
-    def select_single_audio_transcript(cls):
+    def select_single_audio_transcript(cls, audio_file_id):
         """Select single audio transcrip filter by id"""
 
-        query = select(AudioTranscript).where(AudioTranscript.id == cls.id)
-        result = db.session.execute(query).first()[0]
+        query = select(AudioTranscript).where(AudioTranscript.id == audio_file_id)
+        result = db.session.execute(query).first()
+
         return result
 
     @classmethod
