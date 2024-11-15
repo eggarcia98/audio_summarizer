@@ -7,7 +7,7 @@ from .models.audio_transcript import AudioTranscript
 
 def get_all_audio_transcripts():
     """Get all saved audio transcript from Database"""
-    return AudioTranscript.select_all_audio_transcript(
+    return AudioTranscript.get_all_audio_transcripts(
         AudioTranscript.id,
         AudioTranscript.duration,
         AudioTranscript.filename,
@@ -19,7 +19,7 @@ def get_single_audio_transcript(audio_file_id):
     """Function to fetch all saved audio trancriptions"""
 
     required_audio = AudioTranscript(id=audio_file_id)
-    result = required_audio.select_single_audio_transcript(audio_file_id)
+    result = required_audio.get_audio_transcript_by_id(audio_file_id)
 
     return result[0].to_dict() if result else None
 

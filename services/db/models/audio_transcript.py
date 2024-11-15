@@ -1,25 +1,30 @@
 """Audio Transcriptions Model Class"""
 
+from typing import Dict, List, Optional, Union
+
 from sqlalchemy import select
+from sqlalchemy.exc import SQLAlchemyError
 
 from services.db import db
 
 
 class AudioTranscript(db.Model):
-    """Audio Transcript Model Configuration"""
+    """Model representing an audio transcript in the database."""
 
     __tablename__ = "audio_transcripts"
 
     id = db.Column(db.String(200), primary_key=True)
     filename = db.Column(db.String(255))
-    transcript = db.Column(db.String(255))
+    transcript = db.Column(db.Text)  # Use Text for potentially longer transcriptions
     source_url = db.Column(db.String(80), nullable=True)
-    duration = db.Column(db.String(80), nullable=True)
+    duration = db.Column(
+        db.Integer, nullable=True
+    )  # Better to store duration as Integer
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"<AudioTranscript {self.filename}>"
 
-    def to_dict(self):
+    def to_dict(self) -> Dict[str, Union[str, int]]:
         """Convert AudioTranscript object to dictionary."""
         return {
             "id": self.id,
@@ -30,27 +35,43 @@ class AudioTranscript(db.Model):
         }
 
     @classmethod
-    def select_all_audio_transcript(cls, *columns):
-        """Get all the audio transcriptions saved"""
+    def get_all_audio_transcripts(cls, *columns) -> List[Dict[str, Union[str, int]]]:
+        """Fetch all audio transcriptions with optional specific columns."""
 
-        results = cls.query.with_entities(*columns).all()
-        column_names = [col.key for col in columns]  # Get column names from columns
+        query = cls.query.with_entities(*columns) if columns else cls.query
+        results = query.all()
+        column_names = (
+            [col.key for col in columns] if columns else cls.__table__.columns.keys()
+        )
         return [dict(zip(column_names, row)) for row in results]
 
     @classmethod
-    def select_single_audio_transcript(cls, audio_file_id):
-        """Select single audio transcrip filter by id"""
+    def get_audio_transcript_by_id(
+        cls, audio_file_id: str
+    ) -> Optional["AudioTranscript"]:
+        """Fetch a single audio transcript by its ID."""
 
-        query = select(AudioTranscript).where(AudioTranscript.id == audio_file_id)
-        result = db.session.execute(query).first()
-
-        return result
+        return cls.query.get(audio_file_id)
 
     @classmethod
-    def insert_new_audio_transcript(cls, audio_transcript_data):
-        """Function to save a new transcripted audio to the database"""
+    def insert_new_audio_transcript(
+        cls, audio_transcript_data: "AudioTranscript"
+    ) -> Optional["AudioTranscript"]:
+        """Insert a new audio transcript record into the database.
 
-        db.session.add(audio_transcript_data)
-        db.session.commit()
+        Args:
+            audio_transcript_data: An instance of AudioTranscript to add.
 
-        print("Record inserted successfully.")
+        Returns:
+            The inserted AudioTranscript instance if successful, None otherwise.
+        """
+
+        try:
+            db.session.add(audio_transcript_data)
+            db.session.commit()
+            print("Record inserted successfully.")
+            return audio_transcript_data
+        except SQLAlchemyError as e:
+            db.session.rollback()
+            print(f"Failed to insert record: {e}")
+            return None
