@@ -19,9 +19,11 @@ def get_single_audio_transcript(audio_file_id):
     """Function to fetch all saved audio trancriptions"""
 
     required_audio = AudioTranscript(id=audio_file_id)
-    result = required_audio.get_audio_transcript_by_id(audio_file_id)
+    result = required_audio.get_audio_transcript_by_id(
+        audio_file_id
+    )  ## Audio Transcript {id, filename, transcript, source_url, duration}
 
-    return result[0].to_dict() if result else None
+    return result.to_dict() if result else None
 
 
 def add_new_audio_transcript(downloaded_audio):
