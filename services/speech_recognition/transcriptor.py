@@ -1,8 +1,11 @@
 """Module to manage speech audio recognition"""
 
+import os
+
 import whisper
 
-MODEL = whisper.load_model("./tiny.pt")
+WHISPER_MODEL = os.getenv("WHISPER_MODEL", "/var/lib/volumes/gcs/gcs-1/medium.en.pt")
+MODEL = whisper.load_model(WHISPER_MODEL)
 
 
 def transcribe_audio(audio_path):
