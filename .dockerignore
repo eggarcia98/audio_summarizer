@@ -1,64 +1,14 @@
-# Byte-compiled / optimized / DLL files
+# Ignore Python cache files
 __pycache__/
-*.py[cod]
-*$py.class
+*.pyc
+*.pyo
 
-# Flask and Python-specific logs
-*.log
-
-# Virtual environment
-venv/
+# Ignore virtual environment
 myenv/
-env/
 
-# Environment variable files
-.env
-*.env
-
-# Mac OS-specific files
+# Ignore other unnecessary files
 .DS_Store
-
-# VSCode-specific files
-.vscode/
-
-# PyCharm-specific files
-.idea/
-
-# Jupyter Notebook checkpoints (if you're using notebooks in the project)
-.ipynb_checkpoints
-
-# Database files
-*.sqlite3
-*.db
-
-# Python egg files
-*.egg
-*.egg-info/
-dist/
-build/
-eggs/
-
-# Unit test / coverage results
-htmlcov/
-.coverage
-.tox/
-.nox/
-.cache
-pytest_cache/
-
-# MyPy type checker reports
-.mypy_cache/
-
-# Linting
-pylint.report
-
-# Static files (optional, depending on how you handle static assets)
-static/
-
-# Local development settings
-instance/
-
-#music files
-*.mp3
-*.wav
-.vercel
+.git
+.gitignore
+.pytest_cache/
+.env
