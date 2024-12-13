@@ -4,7 +4,7 @@ import os
 import whisper
 
 # Get model name from env
-WHISPER_MODEL = os.getenv("WHISPER_MODEL", "./tiny.pt")
+WHISPER_MODEL = os.getenv("WHISPER_MODEL", "tiny")
 MODEL = whisper.load_model(WHISPER_MODEL)
 
 
