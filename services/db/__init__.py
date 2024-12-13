@@ -16,7 +16,6 @@ DB_PASSWORD = os.getenv("DB_PASSWORD", "mypassword")
 
 def init_db(app):
     """Initialize the database with the Flask app."""
-    print("AA: ", DB_HOST)
 
     # Configure the database URI (replace with your actual database URI)
     app.config["SQLALCHEMY_DATABASE_URI"] = (
