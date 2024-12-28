@@ -51,6 +51,7 @@ class AudioTranscript(db.Model):
     ) -> Optional["AudioTranscript"]:
         """Fetch a single audio transcript by its ID."""
 
+        print(cls.query.get(audio_file_id))
         return cls.query.get(audio_file_id)
 
     @classmethod

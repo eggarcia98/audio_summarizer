@@ -6,7 +6,7 @@ import torch
 import whisper
 
 WHISPER_MODEL = os.getenv("WHISPER_MODEL", "medium")
-DEVICE = "mps" if torch.backends.mps.is_available() else "cpu"  
+DEVICE = "mps" if torch.backends.mps.is_available() else "cpu"
 print("Device: ", DEVICE)
 
 MODEL = whisper.load_model(WHISPER_MODEL, device=DEVICE)
