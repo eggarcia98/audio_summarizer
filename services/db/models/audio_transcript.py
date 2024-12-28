@@ -2,7 +2,6 @@
 
 from typing import Dict, List, Optional, Union
 
-from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError
 
 from services.db import db
