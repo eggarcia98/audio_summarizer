@@ -10,4 +10,4 @@ RUN  apt-get install -y ffmpeg
 RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
 EXPOSE 8080
-CMD ["gunicorn"  , "-b", "0.0.0.0:8080", "--timeout", "620", "app:app"]
+CMD ["gunicorn"  , "-b", "0.0.0.0:8080", "--timeout", "3600", "app:app"]

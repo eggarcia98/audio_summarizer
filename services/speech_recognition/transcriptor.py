@@ -1,10 +1,10 @@
 """Module to manage speech audio recognition"""
 
 import os
+
 import whisper
 
-# Get model name from env
-WHISPER_MODEL = os.getenv("WHISPER_MODEL", "tiny")
+WHISPER_MODEL = os.getenv("WHISPER_MODEL", "medium")
 MODEL = whisper.load_model(WHISPER_MODEL)
 
 

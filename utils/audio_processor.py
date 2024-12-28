@@ -12,7 +12,6 @@ def set_youtube_config_downloader(downloaded_audio_dict):
     def progress_hook(d):
         if d["status"] == "finished":
             downloaded_audio_dict["filename"] = f'{d["filename"].split(".")[0]}.mp3'
-            # print("FOUND: ", downloaded_audio_dict)
 
     ydl_opts = {
         "format": "bestaudio/best",

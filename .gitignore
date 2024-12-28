@@ -61,3 +61,5 @@ instance/
 #music files
 *.mp3
 *.wav
+
+*.en.pt
