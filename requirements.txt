@@ -92,4 +92,4 @@ SQLAlchemy==2.0.36
 # Werkzeug==3.0.4
 # yarg==0.1.9
 yt-dlp==2024.8.6
-torch
+# torch
