@@ -15,7 +15,10 @@ from utils.audio_processor import (
     get_audio_identificator,
     handle_audio_input,
 )
-from utils.request_helpers import handle_json_request, is_json_request
+from utils.request_helpers import (
+    is_json_request,
+    handle_audio_source,
+)
 
 
 def register_routes(app):
@@ -42,7 +45,7 @@ def register_routes(app):
         Transcribes audio and returns the transcript.
         """
         try:
-            audio_source = handle_audio_source()
+            audio_source = handle_audio_source(request)
         except ValueError as error:
             return jsonify({"error": str(error)}), 400
 
@@ -53,13 +56,6 @@ def register_routes(app):
             )
 
         return process_audio(audio_source)
-
-
-def handle_audio_source():
-    """Handle the audio source from the request."""
-    if is_json_request(request):
-        return handle_json_request(request)
-    return request.files.get("audio")
 
 
 def process_audio(audio_source):
