@@ -25,7 +25,7 @@ def register_routes(app):
     """Register all routes for the Flask application."""
 
     @app.route("/", methods=["GET"])
-    @cross_origin()
+    @cross_origin("*")
     def root_path():
         """Root endpoint."""
         return jsonify({"data": "root"}), 200

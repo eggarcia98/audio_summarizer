@@ -5,7 +5,6 @@ import os
 import whisper
 
 WHISPER_MODEL = os.getenv("WHISPER_MODEL", "medium")
-MODEL = whisper.load_model(WHISPER_MODEL)
 
 
 def transcribe_audio(audio_path):
@@ -14,6 +13,7 @@ def transcribe_audio(audio_path):
     Returns the parsed transcript data.
     """
 
+    MODEL = whisper.load_model(WHISPER_MODEL)
     result = MODEL.transcribe(audio_path)
 
     parsed_segments = [
