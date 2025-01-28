@@ -9,6 +9,9 @@ WHISPER_API_URL = os.getenv(
 )
 
 
+print(WHISPER_API_URL)
+
+
 def transcribe_audio(audio_path):
     """
     Transcribes the audio file using the external API service.
