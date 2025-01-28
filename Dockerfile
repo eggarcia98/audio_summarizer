@@ -23,4 +23,4 @@ COPY . /app
 EXPOSE 8080
 
 # Start Gunicorn, binding to 0.0.0.0:8080, using the app object in app.py
-CMD ["gunicorn", "--bind", "0.0.0.0:8080", "--timeout", "600", "app:app"]
+CMD ["python", "app.py"]
