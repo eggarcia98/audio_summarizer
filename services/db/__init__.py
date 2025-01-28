@@ -19,7 +19,7 @@ def init_db(app):
 
     # Configure the database URI (replace with your actual database URI)
     app.config["SQLALCHEMY_DATABASE_URI"] = (
-        f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:5432/{DB_NAME}"
+        f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:5432/{DB_NAME}?sslmode=require"
     )
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
