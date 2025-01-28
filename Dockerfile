@@ -14,6 +14,8 @@ COPY requirements.txt requirements.txt
 # RUN pip install --upgrade pip setuptools wheel
 RUN pip install -r requirements.txt
 
+RUN ls -ls
+
 # Copy the rest of the application
 COPY . .
 
