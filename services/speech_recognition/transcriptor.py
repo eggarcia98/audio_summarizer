@@ -4,7 +4,9 @@ import os
 
 import requests
 
-WHISPER_API_URL = os.getenv("API_URL", "http://localhost:8081/get-transcript-audio")
+WHISPER_API_URL = os.getenv(
+    "WHSIPER_API_URL", "http://localhost:8081/get-transcript-audio"
+)
 
 
 def transcribe_audio(audio_path):
