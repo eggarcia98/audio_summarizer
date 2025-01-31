@@ -2,14 +2,10 @@
 
 import os
 
-import requests
+import assemblyai as aai
 
-WHISPER_API_URL = os.getenv(
-    "WHSIPER_API_URL", "http://localhost:8081/get-transcript-audio"
-)
-
-
-print(WHISPER_API_URL)
+# Replace with your API key
+aai.settings.api_key = os.getenv("ASSEMBLYAI_API_KEY", "api_key")
 
 
 def transcribe_audio(audio_path):
@@ -19,40 +15,15 @@ def transcribe_audio(audio_path):
     """
     try:
         # Open the audio file in binary mode
-        with open(audio_path, "rb") as audio_file:
-            print(audio_file)
-            # Send a POST request with the audio file
-            response = requests.post(
-                WHISPER_API_URL,
-                files={"file": audio_file},  # Attach the file to the 'file' field
-                timeout=60 * 10,  # Set a timeout of 60 * 10 seconds
-            )
+        transcriber = aai.Transcriber()
+        transcript = transcriber.transcribe(audio_path)
 
-            # Check if the request was successful
-            if response.status_code != 200:
-                print(f"Error: Received status code {response.status_code}")
-                print("Response:", response.text)
-                return []
-            # Parse the JSON response
+        if transcript.status == aai.TranscriptStatus.error:
+            print(transcript.error)
+            return []
 
-            data = response.json()
-
-            transcription_raw_data = data.get("transcription", "")
-
-            segments = transcription_raw_data.get("segments", [])
-
-            parsed_segments = [
-                {
-                    "audio_end_time": segment["end"],
-                    "audio_start_time": segment["start"],
-                    "transcript": segment["text"].strip(),
-                }
-                for segment in segments
-            ]
-
-            print("Transcription:", parsed_segments)
-
-            return parsed_segments
+        print(transcript.text)
+        return transcript.text
 
     except Exception as e:
         print(f"An error occurred: {e}")
