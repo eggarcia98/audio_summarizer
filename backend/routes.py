@@ -64,10 +64,10 @@ def process_audio(audio_source):
     duration = get_audio_duration(audio_source, is_json_request(request))
     source_url = audio_source if is_json_request(request) else ""
 
-    existing_transcript = get_single_audio_transcript(audio_id)
-    if existing_transcript:
-        audio_remover(existing_transcript.get("filename"))
-        return jsonify(existing_transcript), 200
+    # existing_transcript = get_single_audio_transcript(audio_id)
+    # if existing_transcript:
+    #     audio_remover(existing_transcript.get("filename"))
+    #     return jsonify(existing_transcript), 200
 
     downloaded_audio = handle_audio_input(audio_source, is_json_request(request))
     if not downloaded_audio:
@@ -84,5 +84,5 @@ def process_audio(audio_source):
     )
 
     audio_remover(downloaded_audio["filename"])
-    add_new_audio_transcript(downloaded_audio)
+    # add_new_audio_transcript(downloaded_audio)
     return jsonify(downloaded_audio), 200
