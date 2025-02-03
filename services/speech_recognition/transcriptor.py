@@ -2,14 +2,10 @@
 
 import os
 
-import requests
+import assemblyai as aai
 
-WHISPER_API_URL = os.getenv(
-    "WHSIPER_API_URL", "http://localhost:8081/get-transcript-audio"
-)
-
-
-print(WHISPER_API_URL)
+# Replace with your API key
+aai.settings.api_key = os.getenv("ASSEMBLYAI_API_KEY", "api_key")
 
 
 def transcribe_audio(audio_path):
@@ -19,41 +15,61 @@ def transcribe_audio(audio_path):
     """
     try:
         # Open the audio file in binary mode
-        with open(audio_path, "rb") as audio_file:
-            print(audio_file)
-            # Send a POST request with the audio file
-            response = requests.post(
-                WHISPER_API_URL,
-                files={"file": audio_file},  # Attach the file to the 'file' field
-                timeout=60 * 10,  # Set a timeout of 60 * 10 seconds
-            )
+        transcriber = aai.Transcriber()
+        transcript = transcriber.transcribe(audio_path)
 
-            # Check if the request was successful
-            if response.status_code != 200:
-                print(f"Error: Received status code {response.status_code}")
-                print("Response:", response.text)
-                return []
-            # Parse the JSON response
+        if transcript.status == aai.TranscriptStatus.error:
+            print(transcript.error)
+            return []
 
-            data = response.json()
+        formatted_transcript = format_transcript(transcript)
 
-            transcription_raw_data = data.get("transcription", "")
-
-            segments = transcription_raw_data.get("segments", [])
-
-            parsed_segments = [
-                {
-                    "audio_end_time": segment["end"],
-                    "audio_start_time": segment["start"],
-                    "transcript": segment["text"].strip(),
-                }
-                for segment in segments
-            ]
-
-            print("Transcription:", parsed_segments)
-
-            return parsed_segments
+        return formatted_transcript
 
     except Exception as e:
         print(f"An error occurred: {e}")
         return []
+
+
+def ms_to_seconds(ms):
+    """Convert milliseconds to seconds."""
+    return round(ms / 1000, 2)
+
+
+def format_transcript(transcript):
+    """Format the transcript data for the API response."""
+
+    words_dict_list = [word.__dict__ for word in transcript.words]
+
+    # Process word-level timestamps into sentence-level timestamps
+    sentences = []
+    current_sentence = []
+    sentence_start_time = None
+
+    for word in words_dict_list:
+        if sentence_start_time is None:
+            sentence_start_time = ms_to_seconds(word["start"])
+
+        current_sentence.append(word["text"])
+
+        # If the word ends with a sentence-ending punctuation, finalize the sentence
+        if word["text"].endswith((".", "!", "?")):
+            sentence_text = " ".join(current_sentence)
+            sentence_end_time = ms_to_seconds(word["end"])
+
+            sentences.append(
+                {
+                    "audio_start_time": sentence_start_time,
+                    "audio_end_time": sentence_end_time,
+                    "transcript": sentence_text,
+                }
+            )
+
+            # Reset for the next sentence
+            current_sentence = []
+            sentence_start_time = None
+
+    # Print the formatted transcript
+    formatted_output = {"transcript": sentences}
+
+    return formatted_output
